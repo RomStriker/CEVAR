@@ -1,0 +1,23 @@
+resume: ''
+eval_only: true
+batch_size: 1
+batch_size_per_sample: 2
+dataset: private  # private, aorta_tf
+data_dir: data/private
+max_inference_levels: 500
+max_nodes_per_level: 1000
+max_nodes_test: 100000
+volume_eval: true
+sub_volume_eval: true
+# ' 10' to get all trees of sample 10, 0 to get first batch of all trees of all samples (single element)
+# ' 10-0' to get first tree of sample 10 (multiple elements)
+test_sample: [] #'270-0', '628-0'
+
+# use the predicted seed point for evaluation instead of the gt seed point
+automatic_seed: true
+automatic_seed_path: '/home/roman/PhD/unicorn files/unicorn/Train/test_predicted_seedpoints_1.5.csv'
+
+# eval_starting_depth
+eval_start_depth: 1
+nms_during_eval: true
+merge_new_branches: false

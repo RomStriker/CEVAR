@@ -1,0 +1,227 @@
+# Model parameters
+# decoder's feedforward hidden dim
+dim_feedforward: 2048
+# number of decoder heads
+nheads: 16
+# length of each confluent trajectory
+seq_len: 10
+# size of 3D patch (cubic)
+sub_vol_size: 64
+# cross attend to a smaller center crop of the feature output from the encoder
+focus_vol_size: 20
+# dimension of the decoder tokens
+hidden_dim: 512
+# number of previous positions for the past trajectory token
+num_prev_pos: 10
+num_past_tr_tokens: 3
+# multiples of seq_lens for training
+traj_train_len: 6
+# how many past lvls to retain for variable trajectory length > 1
+retain_past_lvls_num: 5
+# number of deformation steps
+num_steps: 8
+# number of inital branches
+num_init_branches: 20
+# setting number of layer for the producer and directer decoder
+dec_prod_layers: 1
+dec_dir_layers: 1
+# type and size of heads
+# divergence and end position regression heads
+div_mlp_depths: [1024, 512, 256, 128]
+end_mlp_depths: [512, 256, 128, 64]
+mlp_activation: 'swish' # 'relu', 'swish'
+
+# TODO: add impl for this
+# stent classification head
+# enable/disable stent classification head
+stent_head: false
+#  depths of the stent classification head
+stent_mlp_depths: [512, 256, 128, 64]
+# alpha and gamma for the stent classification focal loss
+stent_alpha: 0.25
+stent_gamma: 2.0
+
+# TODO: add impl for this
+# stent diameter/attachment length regression head
+# enable/disable all regression heads
+stent_dia_heads: false
+# enable/disable stent diameter regression head
+stent_dia_reg: true
+# enable/disable stent attachment length regression head
+stent_attml_reg: true
+# depths of the stent edge classification head
+stent_dia_cls_mlp_depths: [512, 256, 128, 64]
+# alpha and gamma for the stent edge classification focal loss
+# diameter/attachment length is predicted only for the stent edge points
+stent_dia_alpha: 0.25
+stent_dia_gamma: 2.0
+# depths of the stent diameter/attachment length regression head
+stent_dia_reg_mlp_depths: [512, 256, 128, 64]
+
+
+# The probability with which to train the divergence head using the non-bifurcating and bifurcating branches
+# make the following 1.0 if div_end_classify is set to True
+train_div_non_bif_prob: 0.4
+train_div_bif_prob: 1.0
+
+# Swin UNETR params
+unetr_pretrained_weights: ''
+unetr_dim: 24
+depths: [2, 2, 2, 2]
+num_heads: [3, 6, 12, 24]
+patch_size: 2
+window_size: 7
+
+# Misc
+dropout: 0.1
+pre_norm: false
+aux_loss: true
+
+# Matcher
+# position cost weight
+set_cost_direction: 3.0
+# radius cost weight
+set_cost_radius: 1.0
+# Loss
+# position loss weight
+dir_loss_coef: 3.0
+# radius loss weight
+rad_loss_coef: 1.0
+# divergence loss weight
+div_loss_coef: 0.3
+#  end loss weight
+end_loss_coef: 0.375
+
+# TODO: add impl for this
+# divergence and end classification loss weights
+div_cls_loss_coef: 12.85
+end_cls_loss_coef: 0.375
+
+# TODO: add impl for this
+stent_cls_loss_coef: 4.0
+stent_dia_cls_loss_coef: 1.0
+stent_dia_reg_loss_coef: 1.0
+
+# Dataset & Dataloader
+dataset: private  # private, aorta_tf
+data_dir: data/private
+batch_size: 4
+batch_size_val: 1
+mask: false
+determinism: true
+
+# Data sampling probabilities
+# probability of sampling a point close to the root of the centerline
+root_prob: 0.1
+# probability of sampling a point close to a bifurcation of the centerline
+bifur_prob: 0.3
+# probability of sampling a point close to an end of the centerline
+end_prob: 0.1
+
+# TODO: add impl for this
+# for some samples the stent centerline moves upward, which is not common (anomaly),
+# so when training on random samples that don't fall in the above fraction, anom_prob
+# fraction of the samples are from the anomalous set.
+anom_prob: 0.0
+# probability of sampling a point close to the stent start
+stent_start_prob: 0.1
+# probability of sampling a point close to the stent end
+stent_end_prob: 0.2
+
+num_workers: 1
+# window input intensity values (clamp)
+window_input: false
+window_max: -500
+window_min: -1000
+# SmartCacheDataset Params
+cache_num: 16
+replace_rate: 0.125
+num_init_workers: 4
+num_replace_workers: 2
+
+
+# Miscellaneous
+# path where to save, empty for no saving
+output_dir: ''
+# device to use for training / testing
+device: cuda
+seed: 37
+amp: true
+
+
+# distributed training parameters
+distributed: true # is set to true by the init function
+debug: false
+# number of distributed processes
+world_size: 1
+# url used to set up distributed training
+dist_url: env://
+
+
+# learning rate and epochs
+# number of epoch (1 epoch = 32 samples)
+epochs: 60000
+lr: 0.0001
+min_lr: 0.00001
+lr_sch: 'cos_ann'
+weight_decay: 0.0001
+
+
+# Validation and Evaluation
+eval_only: false
+volume_eval: true
+sub_volume_eval: false
+val_interval_sv: 100
+test_sample: []
+save_checkpoint: 10
+val_interval: 100
+# epoch interval for model saving. if 0 only save last and best models
+save_model_interval: 2000
+# Limit prediction
+eval_limit_levels: true
+max_inference_levels: 100
+eval_limit_nodes_per_level: true
+max_nodes_per_level: 200
+max_nodes_test: 150000
+# param for setting number of sub-vols of a sample to process at the
+# same time during inference.
+batch_size_per_sample: 16
+# threshold for f1 score
+multiple_fraction_thresholds: false
+f1_thresholds: [0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75]
+# compute test results
+test_eval: false
+
+
+# resume training
+resume: ''
+
+# TODO: add impl for this
+# For stability this can be set to true to only train the position regression heads if there is an end or a bifurcation
+div_end_classify: true
+div_end_classify_binary: true
+div_alpha: 0.03
+end_alpha: 0.015
+div_end_gamma: 2.0
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
